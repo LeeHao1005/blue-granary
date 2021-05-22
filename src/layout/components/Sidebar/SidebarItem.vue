@@ -8,9 +8,9 @@
       </app-link>
     </template>
 
-    <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
+    <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body >
       <template slot="title">
-        <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
+        <item v-if="item.meta" :icon="item.meta && item.meta.icon"  :title="item.meta.title" />
       </template>
       <sidebar-item
         v-for="child in item.children"
@@ -18,7 +18,6 @@
         :is-nest="true"
         :item="child"
         :base-path="resolvePath(child.path)"
-        class="nest-menu"
       />
     </el-submenu>
   </div>
@@ -93,3 +92,12 @@ export default {
   }
 }
 </script>
+<style>
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+</style>

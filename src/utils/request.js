@@ -39,22 +39,9 @@ service.interceptors.response.use(
    */
   response => {
     // if the custom code is not 100, it is judged as an error.
+    const res = response.data
     if (res.code == 401) {
-      // Message({
-      //   message: res.message || 'Error check your token or method',
-      //   type: 'error',
-      //   duration: 2 * 1000
-      // })
-      // console.log(1111111111)
-      // console.log(this.$router)
-      // this.$router.push({path: "/"});
-      // // this.$store.dispatch('/').then(() => {
-      // //   // this.$router.push({
-      // //   //   path: '/'
-      // //   // });
-      //   console.log(22222)
-      // })
-      localStorage.clear();     //删除用户信息
+      localStorage.clear();     //删除原有的过期的用户信息
       //如果超时就处理 ，指定要跳转的页面(比如登陆页)
       Message({
         message: 'token失效,请重新登录!',

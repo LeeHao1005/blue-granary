@@ -1,5 +1,5 @@
 <template>
-  <div id="data-collection">
+  <div id="data-collection" >
     <el-row :gutter="20">
       <el-col :span="16">
         <!-- 视频 -->
@@ -12,10 +12,15 @@
               <img :src="imgSrc" alt="" />
             </div>
           </div>
-          <div class="control">
-            <el-button type="primary" @click="getCompetence"
-              >打开摄像头</el-button
-            >
+          <div>
+<!--            <svg class="icon" aria-hidden="true">-->
+<!--              <use xlink:href="#icon-shexiangtou"></use>-->
+<!--            </svg>-->
+            <el-button type="primary" @click="getCompetence" >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-shexiangtou"></use>
+              </svg>
+             打开摄像头</el-button>
             <el-button type="primary" @click="postPic">识别</el-button>
           </div>
         </div>
@@ -68,7 +73,6 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
 import axios from "axios";
 export default {
@@ -121,7 +125,7 @@ export default {
             that.use_results = true;
             that.orgdata = res.data.data;
             var datajson = JSON.parse(res.data.data);
-            // console.log(res);
+            console.log(res);
             // console.log(res.type);
             // console.log(datajson);
             that.form.filepath = res.data.filepath;
@@ -404,7 +408,6 @@ export default {
           (res) => {
             if (res.code == "200") {
               this.$message({ message: "保存成功", type: "success" });
-              console.log()
             }
             else{
               this.$message.error(res.message);
@@ -572,6 +575,13 @@ export default {
   height: 100%;
 }
 
+ .icon {
+   width: 1em;
+   height: 1em;
+   vertical-align: -0.15em;
+   fill: currentColor;
+   overflow: hidden;
+ }
 /* 左边 */
 #data-collection .left-contain {
   display: flex;

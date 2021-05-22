@@ -36,7 +36,7 @@ export const constantRoutes = [
     component: Layout,
     meta: {
       title: "系统功能",
-      icon: "system-functions"
+      icon: "xitonggongneng"
     },
     children: [
       {
@@ -45,31 +45,38 @@ export const constantRoutes = [
         name: "data-collection",
         component: () => import("@/views/system-functions/data-collection"),
         meta: {
-          title: "数据采集"
+          title: "数据采集",
+          icon:"shujucaiji"
         },
+
       },
       {
         path: "data-management",
         name: "data-management",
         component: () => import("@/views/system-functions/data-management"),
         meta: {
-          title: "数据管理"
-        }
+          title: "数据管理",
+          icon:"shujuguanli"
+        },
+
       },
       {
         path: "user-management",
         name: "user-management",
         component: () => import("@/views/system-functions/user-management"),
         meta: {
-          title: "用户管理"
-        }
+          title: "用户管理",
+          icon:"yonghuguanli"
+        },
+
       },
       {
         path: "system-config",
         name: "system-config",
         component: () => import("@/views/system-functions/system-config"),
         meta: {
-          title: "系统配置"
+          title: "系统配置",
+          icon: "xitongpeizhi"
         }
       },
       {
@@ -77,7 +84,8 @@ export const constantRoutes = [
         name: "instruction",
         component: () => import("@/views/system-functions/instruction"),
         meta: {
-          title: "使用说明"
+          title: "使用说明",
+          icon: "shangchuanxiangqingyeicon11"
         }
       }
     ]

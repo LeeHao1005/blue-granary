@@ -1,7 +1,7 @@
 <template>
-  <div :class="classObj" class="app-wrapper">
+  <div :class="classObj" >
     <el-container>
-      <el-header>蓝色粮仓数据采集系统</el-header>
+
       <sidebar class="sidebar-container" />
       <div class="main-container">
         <div :class="{ 'fixed-header': fixedHeader }">
@@ -63,10 +63,14 @@ export default {
   position: relative;
   height: 100%;
   width: 100%;
+
   &.mobile.openSidebar {
     position: fixed;
     top: 0;
   }
+}
+.header-wrapper{
+  background-image: url("../icons/photo/LOGO@NAME.png");
 }
 .drawer-bg {
   background: #000;
@@ -99,5 +103,8 @@ export default {
   text-align: center;
   line-height: 60px;
   border-bottom: 2px solid #1f2d3d;
+}
+.main-container {
+  width: 100%;
 }
 </style>

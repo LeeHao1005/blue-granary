@@ -1,22 +1,24 @@
 <template>
-  <div :class="{'has-logo':showLogo}">
-    <logo v-if="showLogo" :collapse="isCollapse" />
-    <el-scrollbar wrap-class="scrollbar-wrapper">
+  <div class="scrollbar-wrapper" >
+<!--    <logo v-if="showLogo" :collapse="isCollapse" class="loge-wrapper"/>-->
+    <div class="loge-wrapper"></div>
+    <el-scrollbar >
       <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
-        :background-color="variables.menuBg"
         :text-color="variables.menuText"
         :unique-opened="false"
         :active-text-color="variables.menuActiveText"
         :collapse-transition="false"
         mode="vertical"
+        class="scrollbar-wrapper"
       >
         <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
       </el-menu>
     </el-scrollbar>
   </div>
 </template>
+
 
 <script>
 import { mapGetters } from 'vuex'
@@ -54,3 +56,14 @@ export default {
   }
 }
 </script>
+<style>
+.scrollbar-wrapper{
+  background-image: url("../../../icons/photo/menuBJ.jpg");
+}
+.loge-wrapper{
+  height: 36px;
+  width: 185px;
+  background-image: url("../../../icons/photo/LOGO@NAME-X.png");
+}
+
+</style>

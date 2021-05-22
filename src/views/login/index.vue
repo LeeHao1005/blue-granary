@@ -9,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">蓝色粮仓数据采集系统</h3>
+<!--        <h3 class="title">蓝色粮仓数据采集系统</h3>-->
       </div>
 
       <el-form-item prop="username">
@@ -52,7 +52,7 @@
       <el-button
         id="login_btn"
         type="primary"
-        style="width: 100%; margin-bottom: 30px"
+        style="width: 80%; margin: 30px auto; display: block"
         @click.native.prevent="handleLogin"
         >登录</el-button
       >
@@ -84,7 +84,7 @@ export default {
     };
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error("密码不能为空！"));
+        callback(new Error("密码不能小于6位！"));
       } else {
         callback();
       }
@@ -140,22 +140,21 @@ export default {
               "password": that.loginForm.password,
             },
             method: "POST",
-          }).then((res) => {
+          }).then(
+            (res) => {
               if (res.code == 200) {
-                // console.log("res :", res);
                 localStorage.setItem("token", res.data.token);
-                // console.log(localStorage.getItem("token"));
-                // localStorage.setItem("token", res.data.token);
+                localStorage.setItem("name", that.loginForm.username);
                 // localStorage.setItem("userInfo", JSON.stringify(res.data.userInfo));
                 // this.$router.push({name: "user-management",query:{"username":that.loginForm.username}});
                 this.$router.push({path: "/system"});
-
               }
               else{
                 this.$message.error(res.message);
               }
             },
             (err) => {
+              console.log(err)
               this.$message.error(err.message);
               this.passwordError = true;
             }
@@ -180,6 +179,7 @@ export default {
 }
 $bg: #283443;
 $light_gray: #fff;
+$dark: #000;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -201,20 +201,22 @@ $cursor: #fff;
       -webkit-appearance: none;
       border-radius: 0px;
       padding: 12px 5px 12px 15px;
-      color: $light_gray;
+      color: $dark;
       height: 47px;
-      caret-color: $cursor;
+      caret-color: $dark;
 
       &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
+        box-shadow: 0 0 0px 1000px $light_gray inset !important;
+        -webkit-text-fill-color: $dark !important;
       }
     }
   }
 
   .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
+    margin: 30px auto;
+    width: 80%;
+    border: 1px solid rgb(255, 255, 255);
+    background: rgb(255, 255, 255);
     border-radius: 5px;
     color: #454545;
   }
@@ -229,16 +231,18 @@ $light_gray: #eee;
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: $bg;
+  //background-color: $bg;
+  background-image: url("../../icons/photo/BJ.jpg");
   overflow: hidden;
 
   .login-form {
     position: relative;
-    width: 520px;
+    width: 630px;
     max-width: 100%;
-    padding: 160px 35px 0;
+    padding: 100px 0 0;
     margin: 0 auto;
     overflow: hidden;
+    box-sizing: border-box;
   }
 
   .tips {
@@ -263,6 +267,8 @@ $light_gray: #eee;
 
   .title-container {
     position: relative;
+    height: 104px;
+    background-image: url("../../icons/photo/LOGO@NAME.png");
 
     .title {
       font-size: 26px;
