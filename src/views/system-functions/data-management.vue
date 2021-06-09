@@ -1,5 +1,5 @@
 <template>
-  <div style="overflaw: scroll">
+  <div style="overflaw: scroll" class="root-data-management">
     <!--选择查询条件-->
     <div class="data_select">
       <!--日期选择-->
@@ -15,7 +15,7 @@
         >
         </el-date-picker>
         <!--类别选择-->
-        <el-form-item label="查询日期"></el-form-item>
+        <el-form-item label="查询类型" style="margin-left: 30px"></el-form-item>
         <el-select v-model="pic_type" placeholder="请选择" @change="sortChange">
           <el-option
             v-for="item in options"
@@ -26,22 +26,56 @@
           >
           </el-option>
         </el-select>
-        <el-button type="primary" icon="el-icon-search" @click="getAllData">查询</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="goExport">导出所有数据</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="getAllData" style="margin-left: 30px">查询</el-button>
+        <el-button type="primary" icon="el-icon-folder-opened" @click="goExport" style="margin-left: 30px">导出所有数据</el-button>
       </el-form>
     </div>
     <div class="grid-content ">
       <!--数据显示-->
       <div class="data-contain">
         <el-table :data="tableData"
+                  border
                   style="width: 100%"
                   :header-cell-style="{background:'#eef1f6',color:'#606266'}"
         >
           <el-table-column
-            v-for="(item, index) in tableLable"
+            v-for="(item, index) in tableLable1"
             :key="index"
             :prop="item.prop"
             :label="item.label"
+            align="center"
+          >
+          </el-table-column>
+          <el-table-column v-if="istype2"
+            label="阀的开度调节值 + 蒸汽调节温度"
+            align="center"
+          >
+            <el-table-column
+              v-for="(aitem, aindex) in subtableLabletype2"
+              :prop="aitem.prop"
+              :key="aitem.code"
+              :label="aitem.label"
+              align="center"
+            >
+            </el-table-column>
+          </el-table-column >
+          <el-table-column
+            v-if="istype2"
+            v-for="(bitem, bindex) in tableLabletype2"
+            :key="bitem.id"
+            :prop="bitem.prop"
+            :label="bitem.label"
+            align="center"
+          >
+          </el-table-column>
+          <!--图片路径列-->
+          <el-table-column
+            width="360"
+            v-for="(citem,cindex) in tableLable2"
+            :key="citem.id"
+            :prop="citem.prop"
+            :label="citem.label"
+            align="center"
           >
           </el-table-column>
         </el-table>
@@ -71,7 +105,10 @@ export default {
   data() {
     return {
       tableData: null,
-      tableLable: [],
+      tableLable1: [],
+      tableLable2: [],
+      tableLabletype2: [],
+      subtableLabletype2: [],
       options: [
         {
           value: '1',
@@ -100,6 +137,7 @@ export default {
       paginationShow: true,
       currentPage: 1,
       pageSize: 10,
+      istype2:false,
       pic_type: '1',
       min: '',
       max: '',
@@ -121,9 +159,9 @@ export default {
           [
             // "序号",
             '船号',
-            '蒸汽温度1',
-            '蒸汽温度2',
-            '进料时压力',
+            '蒸汽温度1(℃)',
+            '蒸汽温度2(℃)',
+            '进料时压力(bar)',
             '保存路径',
             '时间'
           ]
@@ -132,13 +170,15 @@ export default {
           [
             // "序号",
             '船号',
-            '蒸汽调节温度+阀的开度调节',
-            '进料速度',
-            '气体压力',
-            '离心转速 Diff speed',
-            '离心转速 Bowl speed',
-            '温度 MD Temp',
-            '温度 GB Temp',
+            // '蒸汽调节温度+阀的开度调节',
+            '蒸汽调节温度(℃)',
+            '阀的开度调节值(%)',
+            '进料速度(%)',
+            '气体压力(bar)',
+            '离心转速 Diff speed(rpm)',
+            '离心转速 Bowl speed(tpm)',
+            '温度 MD Temp(℃)',
+            '温度 GB Temp(℃)',
             '保存路径',
             '时间'
           ]
@@ -147,11 +187,11 @@ export default {
           [
             // "序号",
             '船号',
-            '2J01A-T01CV01',
-            '蒸汽温度 2J01A-T01TT01',
-            '蒸汽温度 2J01A-T01TT02',
-            '蒸汽压力 2J01A-T01PT01',
-            '蒸汽温度 2J01A-T01TT04',
+            '2J01A-T01CV01(%)',
+            '蒸汽温度 2J01A-T01TT01(℃)',
+            '蒸汽温度 2J01A-T01TT02(℃)',
+            '蒸汽压力 2J01A-T01PT01(bar)',
+            '蒸汽温度 2J01A-T01TT04(℃)',
             '保存路径',
             '时间'
           ]
@@ -162,8 +202,10 @@ export default {
   },
   mounted: function() {
     this.getAllData()
+
   },
   methods: {
+
     // 导出excel分sheet
     goExport() {
       var that = this
@@ -205,11 +247,12 @@ export default {
           }
         } else if (item == '2') {
           for (var i in data[2]) {
-            var listS = []
+            var listS = [];
             listS = [
               // data[2][i].id,
               data[2][i].shipNumber,
-              data[2][i].value1,
+              JSON.parse(data[2][i].value1)['蒸汽调节温度(℃)'],
+              JSON.parse(data[2][i].value1)['阀的开度调节值(%)'],
               data[2][i].value2,
               data[2][i].value3,
               data[2][i].value4,
@@ -222,7 +265,7 @@ export default {
             that.list[1].push(listS)
           }
         } else if (item == '3') {
-          for (var i in data[2]) {
+          for (var i in data[3]) {
             var listS = []
             listS = [
               // data[3][i].id,
@@ -246,6 +289,7 @@ export default {
     handleSizeChange(val) {
       var that = this
       that.pageSize = val
+      that.currentPage = 1
       that.getAllData()
     },
 
@@ -299,51 +343,61 @@ export default {
                 var ss = that.dateFilter(element.createTime)
                 element.createTime = ss
               })
-
               that.tableData = list
 
               that.total = res.data.total
               switch (that.pic_type) {
                 case '1':
-                  that.tableLable = [
-                    // { label: "编号", prop: "id" },
+                  that.istype2 = false
+                  that.tableLable1 = [
                     { label: '船舶编号', prop: 'shipNumber' },
-                    // { label: "图片类型", prop: "photoType" },
+                    { label: '蒸汽温度(℃)', prop: 'value1' },
+                    { label: '蒸汽温度(℃)', prop: 'value2' },
+                    { label: '进料时压力(bar)', prop: 'value3' },
                     { label: '生成时间', prop: 'createTime' },
+                  ]
+                  that.tableLable2 = [
                     { label: '图片路径', prop: 'filepath' },
-                    { label: '蒸汽温度', prop: 'value1' },
-                    { label: '蒸汽温度', prop: 'value2' },
-                    { label: '进料时压力', prop: 'value3' }
                   ]
                   break
                 case '2':
-                  that.tableLable = [
-                    // { label: "编号", prop: "id" },
+                  that.istype2 = true
+                  for(var item in list){
+                    that.tableData[item]['value1'] = JSON.parse(list[item]['value1'])
+                  }
+                  that.tableLable1 = [
                     { label: '船舶编号', prop: 'shipNumber' },
-                    // { label: "图片类型", prop: "photoType" },
+                  ]
+                  that.subtableLabletype2 = [
+                    { label: '蒸汽调节温度(℃)', prop: 'value1.蒸汽调节温度(℃)' },
+                    { label: '阀的开度调节(%)', prop: 'value1.阀的开度调节值(%)' }
+                  ]
+                  that.tableLabletype2 = [
+                    { label: '进料速度(%)', prop: 'value2' },
+                    { label: '气体压力(bar)', prop: 'value3' },
+                    { label: 'Diff speed离心转速(rpm)', prop: 'value4' },
+                    { label: 'Bowl speed离心转速(rpm)', prop: 'value5' },
+                    { label: 'MD Temp温度(℃)', prop: 'value6' },
+                    { label: 'GB Temp温度(℃)', prop: 'value7' },
                     { label: '生成时间', prop: 'createTime' },
-                    { label: '图片路径', prop: 'filepath' },
-                    { label: '蒸汽调节温度+阀的开度调节', prop: 'value1' },
-                    { label: '1D01A-W02M01进料速度', prop: 'value2' },
-                    { label: '1D01A-W02PT02气体压力', prop: 'value3' },
-                    { label: 'Diff speed离心转速', prop: 'value4' },
-                    { label: 'Bowl speed离心转速', prop: 'value5' },
-                    { label: 'MD Temp温度', prop: 'value6' },
-                    { label: 'GB Temp温度', prop: 'value7' }
+                  ]
+                  that.tableLable2=[
+                    { label: '图片路径', prop: 'filepath' }
                   ]
                   break
                 case '3':
-                  that.tableLable = [
-                    // { label: "编号", prop: "id" },
+                  that.istype2 = false
+                  that.tableLable1 = [
                     { label: '船舶编号', prop: 'shipNumber' },
-                    // { label: "图片类型", prop: "photoType" },
+                    { label: '2J01A-T01CV01(%)', prop: 'value1' },
+                    { label: '2J01A-T01TT01蒸汽温度(℃)', prop: 'value2' },
+                    { label: '2J01A-T01TT02蒸汽温度(℃)', prop: 'value3' },
+                    { label: '2J01A-T01PT01蒸汽压力(bar)', prop: 'value4' },
+                    { label: '2J01A-T01TT04蒸汽温度(℃)', prop: 'value5' },
                     { label: '生成时间', prop: 'createTime' },
+                  ]
+                  that.tableLable2 = [
                     { label: '图片路径', prop: 'filepath' },
-                    { label: '2J01A-T01CV01', prop: 'value1' },
-                    { label: '蒸汽温度 2J01A-T01TT01', prop: 'value2' },
-                    { label: '蒸汽温度 2J01A-T01TT02', prop: 'value3' },
-                    { label: '蒸汽压力 2J01A-T01PT01', prop: 'value4' },
-                    { label: '蒸汽温度 2J01A-T01TT04', prop: 'value5' }
                   ]
                   break
               }
@@ -357,7 +411,6 @@ export default {
             that.loading = false
           }
         )
-
       that.total = null
       that.min = ''
       that.max = ''
@@ -398,14 +451,18 @@ export default {
 </script>
 
 <style lang="scss">
+.root-data-management {
+  margin: 50px auto;
+  width: 90%;
+}
 .data_select {
-  margin: 30px auto 30px 30px;
+  //margin: 30px auto 30px 30px;
   display: block;
 }
 
 .grid-content {
-  width: 90%;
+  width: 100%;
   border: 2px solid #eee;
-  margin: 10px auto;
+  margin: 20px auto;
 }
 </style>

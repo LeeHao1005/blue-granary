@@ -7,9 +7,10 @@
         :default-active="activeMenu"
         :collapse="isCollapse"
         :text-color="variables.menuText"
-        :unique-opened="false"
+        :unique-opened="true"
         :active-text-color="variables.menuActiveText"
         :collapse-transition="false"
+        :default-openeds="['/system']"
         mode="vertical"
         class="scrollbar-wrapper"
       >

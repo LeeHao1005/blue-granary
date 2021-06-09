@@ -55,7 +55,7 @@ export default {
 @import "~@/styles/variables.scss";
 
 #app .sidebar-container {
-  top: 60px;
+  top: 0px;
 }
 
 .app-wrapper {

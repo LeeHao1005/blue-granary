@@ -10,14 +10,15 @@
         title="个人信息"
         width="500"
         trigger="click"
-        v-model="visible">
+        v-model="visible"
+      >
         <el-form :inline="true">
           <el-form-item label="用户名">
             <el-input v-model="this.username" :disabled="true"></el-input>
           </el-form-item>
-          <el-form-item label="电话号码">
-            <el-input v-model="this.username" :disabled="true"></el-input>
-          </el-form-item>
+<!--          <el-form-item label="电话号码">-->
+<!--            <el-input v-model="this.username" :disabled="true"></el-input>-->
+<!--          </el-form-item>-->
         </el-form>
         <el-button type="danger" @click="logout">退出登录</el-button>
         <el-button  type="primary" @click="updatepsd_sure">重置密码</el-button>
@@ -184,7 +185,6 @@ export default {
 
   .right-menu {
     float: right;
-    height: 100%;
     line-height: 50px;
     margin-right: 20px;
 
@@ -195,7 +195,6 @@ export default {
     .right-menu-item {
       display: inline-block;
       padding: 0 8px;
-      height: 100%;
       font-size: 18px;
       color: #5a5e66;
       vertical-align: text-bottom;

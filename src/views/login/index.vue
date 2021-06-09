@@ -56,13 +56,6 @@
         @click.native.prevent="handleLogin"
         >登录</el-button
       >
-<!--      <el-button-->
-<!--        id="register_btn"-->
-<!--        type="primary"-->
-<!--        style="width: 100%; margin-bottom: 30px"-->
-<!--        @click.native.prevent="register"-->
-<!--        >注册</el-button-->
-<!--      >-->
     </el-form>
     <div class="info">电子科技大学-信息与软件工程学院</div>
   </div>
@@ -83,8 +76,8 @@ export default {
       }
     };
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error("密码不能小于6位！"));
+      if (value.length < 6 || value.length > 18) {
+        callback(new Error('密码长度需介于6-18位之间！'))
       } else {
         callback();
       }
@@ -147,6 +140,10 @@ export default {
                 localStorage.setItem("name", that.loginForm.username);
                 // localStorage.setItem("userInfo", JSON.stringify(res.data.userInfo));
                 // this.$router.push({name: "user-management",query:{"username":that.loginForm.username}});
+                this.$message({
+                  message: "登录成功",
+                  type: "success",
+                })
                 this.$router.push({path: "/system"});
               }
               else{
@@ -156,7 +153,6 @@ export default {
             (err) => {
               console.log(err)
               this.$message.error(err.message);
-              this.passwordError = true;
             }
           );
         } else {

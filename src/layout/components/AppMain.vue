@@ -20,7 +20,7 @@ export default {
 <style scoped>
 .app-main {
   /*50 = navbar  62顶部项目名称*/
-  height: calc(100vh - 112px);
+  height: 100%;
   width: 100%;
   position: relative;
   overflow-x: hidden;

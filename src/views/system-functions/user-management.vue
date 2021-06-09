@@ -4,20 +4,20 @@
     <div>
       <el-form :inline="true">
         <el-form-item label="用户名">
-          <el-input placeholder="请输入"></el-input>
+          <el-input v-model="searchName"></el-input>
         </el-form-item>
         <el-form-item label="电话号码">
-          <el-input placeholder="请输入"></el-input>
+          <el-input v-model="searchPhone"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button icon="el-icon-search" type="primary" @click="">搜索</el-button>
+          <el-button icon="el-icon-search" type="primary" @click="searchUser">搜索</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button icon="el-icon-refresh" type="primary" @click="">重置</el-button>
+          <el-button icon="el-icon-refresh" type="primary" @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
-    <el-button type="primary" icon="el-icon-plus" @click="register_sure">新建用户</el-button>
+    <el-button type="primary" icon="el-icon-plus" @click="register_sure" style="margin:20px auto 0 auto">新建用户</el-button>
     <div>
       <!--用户数据显示-->
       <div>
@@ -29,6 +29,7 @@
                            :key="index"
                            :prop="item.prop"
                            :label="item.label"
+                           align="center"
           >
           </el-table-column>
           <!--状态列-->
@@ -36,6 +37,7 @@
                            :key="item.id"
                            :prop="item.prop"
                            :label="item.label"
+                           align="center"
           >
             <template slot-scope="scope">
               <el-switch
@@ -51,10 +53,10 @@
               </el-switch>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" align="center">
             <template slot-scope="scope">
-              <el-link type="primary" @click="updatepsd_sure(scope.row.username)">重置密码</el-link>
-              <el-link type="primary" @click="changeInfo_sure((scope.row.username))">编辑</el-link>
+              <el-link type="primary" @click="updatepsd_sure(scope.row.username)" style="right: 5px">重置密码</el-link>
+              <el-link type="primary" @click="changeInfo_sure((scope.row.username))" style="right: 5px">编辑</el-link>
               <el-link type="danger" @click="deleteUser(scope.row.username)">删除</el-link>
             </template>
           </el-table-column>
@@ -176,12 +178,9 @@
 
 <script>
 import login from '../login/index'
-
 export default {
   name: 'UserManagement',
-  mounted() {
-    this.getAllUser()
-  },
+
   data() {
     //验证注册时用户名
     const validateRegisterUsername = (rule, value, callback) => {
@@ -193,16 +192,16 @@ export default {
     }
     //验证注册时密码
     const validateRegisterPassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('密码不能小于6位！'))
+      if (value.length < 6 || value.length > 18) {
+        callback(new Error('密码长度需介于6-18位之间！'))
       } else {
         callback()
       }
     }
     //验证修改密码时的新密码
     const validateNewPassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('新密码不能少于6位！'))
+      if (value.length < 6 || value.length > 18) {
+        callback(new Error('密码长度需介于6-18位之间！'))
       } else {
         callback()
       }
@@ -232,6 +231,10 @@ export default {
       register_dialog: false,
       changeInfo_dialog: false,
       password_dialog: false,
+
+      // 条件搜索
+      searchName: "",
+      searchPhone: "",
 
       updatepsdForm: {
         old_password: '',
@@ -271,7 +274,37 @@ export default {
       }
     }
   },
+  mounted() {
+    this.getAllUser();
+  },
   methods: {
+    // 搜索用戶username和photo二选一
+    searchUser () {
+      var that = this;
+      if (that.searchPhone || that.searchName) {
+        var tableDataCopy = [];
+        that.tableData.forEach((element) => {
+          if ((that.searchPhone === element.phone) || that.searchName === element.username) {
+            tableDataCopy.splice(1, 0, element);
+          }
+        })
+        that.tableData = tableDataCopy;
+      }else {
+        this.$message({
+          message: '请输入查询内容',
+          type: 'warning'
+        });
+      }
+
+    },
+    // 重置搜索
+    resetSearch() {
+      var that = this;
+      that.searchPhone = "";
+      that.searchName = "";
+      that.getAllUser();
+    },
+
     //改变用户状态，停用或启用
     changeStatus(username,old_status){
       var new_status
@@ -341,6 +374,7 @@ export default {
               if (res.code == 200) {
                 this.$message({ message: '添加成功', type: 'success' })
                 this.register_dialog = false
+                this.getAllUser()
               } else {
                 this.$message.error(res.message)
               }
@@ -349,8 +383,6 @@ export default {
               this.$message.error(err.message)
             }
           )
-        } else {
-          console.log('验证失败')
         }
       })
     },
@@ -394,9 +426,32 @@ export default {
       this.update_username = username
     },
     //提交修改信息
-    //需添加
     changeInfo() {
-      console.log(this.update_username)
+      let that = this
+      this.$refs.changeInfoForm.validate((valid) => {
+        if (valid) {
+          that.req({
+            url: '/updateUserInfo?username=' +
+              that.update_username +
+              '&phone='+that.changeInfoForm.phone,
+            data: {},
+            method: 'GET'
+          }).then(
+            (res) => {
+              if (res.code == 200) {
+                this.$message({ message: '修改成功', type: 'success' })
+                that.changeInfo_dialog = false
+                this.update_username = ''
+                this.getAllUser()
+              } else {
+                this.$message.error(res.message)
+              }
+            },
+            (err) => {
+              this.$message.error(err.message)
+            })
+        }
+      })
     },
     //删除用户
     deleteUser(username) {
@@ -408,15 +463,16 @@ export default {
       }).then(() => {
         that.req({
           url:
-            '/delete/{id}',
+            '/delete?username='+username,
           data: {},
           method: 'GET'
         }).then((res) => {
             if (res.code == 200) {
-              this.update_username = ''
-              console.log(res)
-              console.log(res.data)
-              console.log(res.data.list)
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              that.getAllUser()
             } else {
               this.$message.error(res.message)
             }
@@ -424,10 +480,6 @@ export default {
           (err) => {
             this.$message.error(err.message)
           })
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -440,6 +492,7 @@ export default {
     handleSizeChange(val) {
       var that = this
       that.pageSize = val
+      that.currentPage = 1
       that.getAllUser()
     },
     handleCurrentChange(val) {
@@ -454,18 +507,26 @@ export default {
       that.tableData = null
       that.req({
         url:
-          '/getAllUsers?pageNum=' +
+          '/getAllUsers?' +
+          'pageNum=' +
           that.currentPage +
           '&pageSize=' +
           that.pageSize +
           '&sort=' + '1' +
-          '&operator=' + localStorage.getItem('name'),
+          '&operator=' +
+          localStorage.getItem('name'),
         data: {},
         method: 'GET'
       }).then((res) => {
           if (res.code == 200) {
-            that.tableData = res.data.list
-            that.total = res.data.total
+            var list = res.data.list;
+            list.forEach((element) => {
+              var ss = that.dateFilter(element.createTime);
+              element.createTime = ss;
+            })
+
+            that.tableData = list;
+            that.total = res.data.total;
           } else {
             this.$message.error(res.message)
           }
@@ -473,15 +534,36 @@ export default {
         (err) => {
           this.$message.error(err.message)
         })
+      this.$nextTick(function() {
+        this.paginationShow = true
+      })
+    },
+
+    dateFilter(data) {
+      var dt = new Date(data)
+      var y = dt.getFullYear()
+      var m = (dt.getMonth() + 1).toString().padStart(2, '0')
+      var d = dt.getDate().toString().padStart(2, '0')
+      var h = dt.getHours().toString().padStart(2, '0')
+      var mm = dt.getMinutes().toString().padStart(2, '0')
+      var s = dt.getSeconds().toString().padStart(2, '0')
+
+      return y + '-' + m + '-' + d + ' ' + h + ':' + mm + ':' + s
     }
   }
+
 }
 
 </script>
 
 <style>
-.userData {
+.root {
+  margin: 50px auto;
   width: 90%;
+}
+
+.userData {
+  width: 100%;
   border: 2px solid #eee;
 }
 

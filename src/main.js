@@ -11,7 +11,6 @@ import "./assets/iconfont/iconfont.css"
 // import SvgIcon from "@/components/svg-icon.vue";
 
 
-
 import '@/styles/index.scss' // global css
 
 import App from './App'
@@ -35,8 +34,8 @@ Vue.prototype.req = request
 
 Vue.config.productionTip = false
 
-
 new Vue({
+
   el: '#app',
   router,
   store,
